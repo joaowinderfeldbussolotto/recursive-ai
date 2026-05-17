@@ -18,6 +18,14 @@ services:
       - minio
     restart: unless-stopped
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+    restart: unless-stopped
+
   redis:
     image: redis:7-alpine
     ports:
