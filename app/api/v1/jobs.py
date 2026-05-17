@@ -3,12 +3,18 @@ import json
 from fastapi import APIRouter, HTTPException
 import redis
 
-from app.schemas.jobs import JobStatusResponse
+from app.schemas.jobs import JobLogsResponse, JobStatusResponse
+from app.services.log_service import read_job_logs
 from app.services.storage_service import get_presigned_url
 from app.core.config import settings
 
 router = APIRouter()
 redis_client = redis.from_url(settings.redis_url)
+
+
+@router.get("/jobs/{job_id}/logs", response_model=JobLogsResponse)
+async def get_job_logs(job_id: str):
+    return read_job_logs(job_id)
 
 
 @router.get("/jobs/{job_id}", response_model=JobStatusResponse)

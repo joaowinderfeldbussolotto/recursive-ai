@@ -25,7 +25,7 @@ def summarize_book(self, job_id: str, pdf_bytes_hex: str):
         pdf_bytes = bytes.fromhex(pdf_bytes_hex)
         book_text = extract_text(pdf_bytes)
         ensure_bucket()
-        markdown, chapters = summarize(book_text)
+        markdown, chapters = summarize(book_text, job_id)
         object_key = upload_markdown(job_id, markdown)
         _update_job(job_id, {
             "status": "DONE",

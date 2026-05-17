@@ -1,4 +1,8 @@
-from app.core.rlm_client import rlm
+import os
+
+from rlm import RLM
+from rlm.logger import RLMLogger
+from app.core.config import settings
 
 ROOT_PROMPT = """
 Você tem acesso ao texto completo de um livro técnico na variável `context`.
@@ -20,12 +24,24 @@ Escreva em português, de forma clara e envolvente.
 """
 
 
-def summarize(book_text: str) -> tuple[str, int]:
+def summarize(book_text: str, job_id: str) -> tuple[str, int]:
     """Returns (markdown_content, chapters_processed)."""
-    result = rlm.completion(
-        prompt=book_text,
-        root_prompt=ROOT_PROMPT,
+    log_dir = f"./logs/{job_id}"
+    os.makedirs(log_dir, exist_ok=True)
+
+    rlm = RLM(
+        backend="litellm",
+        backend_kwargs={
+            "model_name": settings.mistral_model,
+            "api_key": settings.mistral_api_key,
+            "base_url": "https://api.mistral.ai/v1",
+            "rpm": settings.mistral_rpm,
+        },
+        environment="local",
+        logger=RLMLogger(log_dir=log_dir),
+        verbose=True,
     )
+
+    result = rlm.completion(prompt=book_text, root_prompt=ROOT_PROMPT)
     markdown = result.response
-    chapters = markdown.count("\n## ")
-    return markdown, chapters
+    return markdown, markdown.count("\n## ")
