@@ -27,7 +27,7 @@ def upload_markdown(job_id: str, content: str) -> str:
         Bucket=settings.minio_bucket,
         Key=key,
         Body=content.encode("utf-8"),
-        ContentType="text/markdown",
+        ContentType="text/markdown; charset=utf-8",
     )
     return key
 

@@ -25,7 +25,7 @@ def poll_job(job_id: str) -> dict:
 def fetch_content(url: str) -> str:
     resp = requests.get(url, timeout=30)
     resp.raise_for_status()
-    return resp.text
+    return resp.content.decode("utf-8")
 
 
 # ── Page config ──────────────────────────────────────────────────────────────
