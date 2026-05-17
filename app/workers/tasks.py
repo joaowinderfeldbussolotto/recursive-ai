@@ -34,9 +34,14 @@ def summarize_book(self, job_id: str, pdf_bytes_hex: str):
             "completed_at": datetime.now(timezone.utc).isoformat(),
         })
     except Exception as exc:
-        _update_job(job_id, {
-            "status": "FAILED",
-            "error": str(exc),
-            "completed_at": datetime.now(timezone.utc).isoformat(),
-        })
+        if self.request.retries >= self.max_retries:
+            try:
+                _update_job(job_id, {
+                    "status": "FAILED",
+                    "error": str(exc),
+                    "completed_at": datetime.now(timezone.utc).isoformat(),
+                })
+            except Exception:
+                pass
+            raise
         raise self.retry(exc=exc)
